@@ -1,0 +1,6 @@
+{
+  "readonlyLines": [],
+  "language": "python",
+  "title": "語法錯誤與除錯",
+  "defaultCode": "# 修正下方程式使其能執行\n# 提示：注意括號與冒號，但不要直接貼上答案\nprint(\"Hello World\"\n"
+}

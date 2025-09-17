@@ -1,0 +1,34 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Install CAL.py backend deps",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/bin/pip install -r cal/server/requirements.txt",
+			"options": {
+				"cwd": "${workspaceFolder}/CAL.py"
+			}
+		},
+		{
+			"label": "Start CAL.py backend (uvicorn)",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/bin/python -m uvicorn cal.server.main:app --reload --host 0.0.0.0 --port 8000",
+			"isBackground": true,
+			"options": {
+				"cwd": "${workspaceFolder}/CAL.py",
+				"env": {
+					"PYTHONPATH": "${workspaceFolder}/CAL.py"
+				}
+			}
+		},
+		{
+			"label": "Serve frontend (http.server 8080)",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/bin/python -m http.server 8080",
+			"isBackground": true,
+			"options": {
+				"cwd": "${workspaceFolder}/CAL.py"
+			}
+		}
+	]
+}

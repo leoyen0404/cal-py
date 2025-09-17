@@ -1,0 +1,6 @@
+{
+  "readonlyLines": [],
+  "language": "python",
+  "title": "邏輯錯誤（Wrong Answer）",
+  "defaultCode": "# 修正邏輯，讓輸出符合預期\n# 題意：把兩個整數 a 和 b 的整數平均輸出（向下取整）\n# 注意：不要輸出小數，請思考負數或邊界案例\n# 範例（非正式測資）：a=5,b=8 => 6\n\na = 5\nb = 8\n# 錯誤示範（可能導致小數）\navg = (a + b) / 2\nprint(avg)\n"
+}

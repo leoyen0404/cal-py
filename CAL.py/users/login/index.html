@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login - CAL.py</title>
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/cal/shared/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/cal/shared/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/cal/shared/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/cal/shared/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/cal/shared/favicons/safari-pinned-tab.svg" color="#3b82f6">
+  <link rel="shortcut icon" href="/cal/shared/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#0f172a">
+  <meta name="theme-color" content="#0f172a">
+  <style>
+    :root{ --bg:#0f172a; --panel:#0b1023; --border:#1f2a44; --text:#e5e7eb; --muted:#94a3b8; --accent:#3b82f6; }
+    *{box-sizing:border-box} html,body{height:100%;margin:0}
+    body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;display:grid;place-items:center}
+    .card{width:min(460px,92vw);background:#0c1227;border:1px solid var(--border);border-radius:16px;padding:24px}
+    .brand{font-weight:700;margin-bottom:16px}
+    label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
+    input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0e1530;color:#e5e7eb}
+    .row{display:flex;gap:10px}
+    button{width:100%;margin-top:16px;padding:10px 14px;border-radius:12px;border:1px solid var(--accent);background:rgba(59,130,246,.15);color:#fff;cursor:pointer}
+    .hint{color:var(--muted);font-size:12px;margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">CAL.py — Login</div>
+    <form id="loginForm">
+      <div class="row">
+        <div style="flex:1">
+          <label>帳號</label>
+          <input id="username" autocomplete="username" />
+        </div>
+        <div style="flex:1">
+          <label>密碼</label>
+          <input id="password" type="password" autocomplete="current-password" />
+        </div>
+      </div>
+      <button type="submit">登入</button>
+      <div class="hint">目前為原型：留白也可登入；登入後會依 next 參數導向。</div>
+    </form>
+  </div>
+  <script>
+    const form = document.getElementById('loginForm');
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      // 簡化：不驗證，直接存 token 並跳轉
+      localStorage.setItem('cal_token', 'dev');
+      const p = new URLSearchParams(location.search).get('next') || '/cal/topiclist/';
+      location.href = p;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CAL.py 520001 — 宣告變數 (Python)</title>
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/cal/shared/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/cal/shared/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/cal/shared/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/cal/shared/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/cal/shared/favicons/safari-pinned-tab.svg" color="#3b82f6">
+  <link rel="shortcut icon" href="/cal/shared/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#0f172a">
+  <meta name="theme-color" content="#0f172a">
+  <style>html,body{height:100%;margin:0} body{background:#0f172a;color:#e5e7eb}</style>
+  <link rel="stylesheet" href="../../shared/topic.css" />
+</head>
+<body>
+  <header class="top-nav">
+    <div class="brand">CAL.py</div>
+    <nav class="capsule-tabs" id="topTabs">
+      <button class="capsule active" data-tab="problem">題目</button>
+      <button class="capsule" data-action="logout">登出</button>
+      <button class="capsule" data-action="leaderboard">排行榜</button>
+    </nav>
+    <div class="spacer"></div>
+    <div class="user-area">Hello, Student</div>
+  </header>
+
+  <main id="layout">
+    <div class="pane left" id="leftPane">
+      <article class="md" id="md"></article>
+    </div>
+    <div class="resize-handle vertical" id="handleV"></div>
+    <div class="pane right" id="rightPane">
+      <div class="subpane editor" id="editorPane">
+        <div class="editor-toolbar">
+          <button id="runBtn" title="執行">▶ Run</button>
+          <button id="judgeBtn" title="批改">✓ Judge</button>
+          <button id="resetBtn" title="重設">↺ Reset</button>
+        </div>
+        <div id="editor" class="code"></div>
+      </div>
+      <div class="resize-handle horizontal" id="handleH"></div>
+      <div class="subpane terminal" id="termPane">
+        <div class="stdin-bar">
+          <input id="stdinInput" type="text" placeholder="本題不需輸入" disabled />
+        </div>
+        <div id="terminal" class="terminal"></div>
+      </div>
+    </div>
+  </main>
+
+  <template id="tmpl-terminal-line"><div class="tline"></div></template>
+
+  <!-- Ace editor (CDN, no build) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-python.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/theme-tomorrow_night.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script type="module" src="../../shared/topic.js"></script>
+</body>
+</html>

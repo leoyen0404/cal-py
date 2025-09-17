@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Leaderboard - CAL.py</title>
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/cal/shared/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/cal/shared/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/cal/shared/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/cal/shared/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/cal/shared/favicons/safari-pinned-tab.svg" color="#3b82f6">
+  <link rel="shortcut icon" href="/cal/shared/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#0f172a">
+  <meta name="theme-color" content="#0f172a">
+  <style>
+    :root{ --bg:#0f172a; --panel:#0b1023; --border:#1f2a44; --text:#e5e7eb; --muted:#94a3b8; --accent:#22c55e; }
+    *{box-sizing:border-box} html,body{height:100%;margin:0}
+    body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;display:flex;flex-direction:column}
+    header{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);background:#0c1227}
+    .brand{font-weight:700}
+    .spacer{flex:1}
+    .capsule{border:1px solid var(--accent);background:rgba(34,197,94,.12);color:#fff;border-radius:999px;padding:6px 12px;cursor:pointer}
+    main{max-width:900px;width:92vw;margin:24px auto}
+    table{width:100%;border-collapse:collapse}
+    th,td{border-bottom:1px solid var(--border);padding:10px;text-align:left}
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">CAL.py — Leaderboard</div>
+    <div class="spacer"></div>
+  <button class="capsule" id="backBtn">返回列表</button>
+  <button class="capsule" id="logoutBtn">登出</button>
+  </header>
+  <main>
+    <p class="muted">簡易占位排行榜頁面（Demo）。</p>
+    <table>
+      <thead><tr><th>名次</th><th>使用者</th><th>完成題數</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </main>
+  <script>
+    (function(){
+      const rows = document.getElementById('rows');
+      function solvedCount(){
+        let n=0; for(let i=0;i<localStorage.length;i++){
+          const k = localStorage.key(i) || '';
+          if(/^pass-\d+$/.test(k) && localStorage.getItem(k)) n++;
+        } return n;
+      }
+      const demo = [
+        {user:'Student', solved: solvedCount()},
+        {user:'Demo-2', solved: 1},
+        {user:'Demo-3', solved: 0},
+      ].sort((a,b)=>b.solved-a.solved);
+      rows.innerHTML = demo.map((v,i)=>`<tr><td>${i+1}</td><td>${v.user}</td><td>${v.solved}</td></tr>`).join('');
+      document.getElementById('backBtn').addEventListener('click', ()=> location.href='/cal/topiclist/');
+      document.getElementById('logoutBtn').addEventListener('click', ()=>{
+        try{ localStorage.removeItem('cal_token'); }catch{}
+        location.href = '/users/login/?next=%2Fcal%2Ftopiclist%2F';
+      });
+    })();
+  </script>
+</body>
+</html>

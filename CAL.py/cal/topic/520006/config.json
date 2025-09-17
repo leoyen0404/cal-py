@@ -1,0 +1,8 @@
+{
+  "readonlyLines": [],
+  "language": "python",
+  "title": "輸入讀取與型態轉換",
+  "requiresInput": true,
+  "sampleInput": "3\n9\n",
+  "defaultCode": "# 讀入兩行數字並相加\n# 提示：input() 讀回來是字串，要用 int() 轉成整數\na = input()\nb = input()\n# TODO: 請修正下行程式碼，確保輸出是整數和\nprint(a + b)\n"
+}

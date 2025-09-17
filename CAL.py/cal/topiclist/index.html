@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CAL.py 題目列表</title>
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/cal/shared/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/cal/shared/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/cal/shared/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/cal/shared/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/cal/shared/favicons/safari-pinned-tab.svg" color="#3b82f6">
+  <link rel="shortcut icon" href="/cal/shared/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#0f172a">
+  <meta name="theme-color" content="#0f172a">
+  <style>
+    :root{ --bg:#0f172a; --panel:#0b1023; --border:#1f2a44; --text:#e5e7eb; --muted:#94a3b8; --accent:#3b82f6; --ok:#22c55e; }
+    *{box-sizing:border-box} html,body{height:100%;margin:0}
+    body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    header{display:flex;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);background:#0c1227;position:sticky;top:0}
+    .brand{font-weight:700}
+    .spacer{flex:1}
+    .capsule{border:1px solid var(--border);background:#0e1530;color:var(--muted);padding:6px 14px;border-radius:999px}
+    main{max-width:1000px;margin:24px auto;padding:0 16px}
+    .grid{display:grid;grid-template-columns:80px 1fr 90px;gap:8px;border:1px solid var(--border);border-radius:14px;overflow:hidden}
+    .row{display:contents}
+    .cell{padding:12px 14px;border-bottom:1px solid rgba(31,42,68,.6)}
+    .head{background:#0b1023;color:#9fb0cc;font-size:12px;text-transform:uppercase}
+    .row:hover .cell{background:rgba(59,130,246,.06)}
+    a{color:#9ec1ff;text-decoration:none}
+    .pass{color:var(--ok);font-weight:600}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">CAL.py</div>
+    <button class="capsule">題目列表</button>
+    <div class="spacer"></div>
+    <a class="capsule" href="/cal/leaderboard/">排行榜</a>
+    <a class="capsule" href="/users/login/?next=/cal/topiclist/">登出</a>
+  </header>
+  <main>
+    <h2>本週共有 <span id="total">0</span> 題，你已通過 <span id="passed">0</span> 題</h2>
+    <div class="grid" id="grid">
+      <div class="cell head">Number</div>
+      <div class="cell head">Instruction</div>
+      <div class="cell head">Pass</div>
+      <!-- rows will be injected here -->
+    </div>
+  </main>
+  <script>
+    const topics = [
+      {no:1, id:'520001', title:'程式導論與 Hello World', href:'/cal/topic/?id=520001'},
+      {no:2, id:'520002', title:'變數宣告與資料型態', href:'/cal/topic/?id=520002'},
+      {no:3, id:'520003', title:'語法錯誤與除錯（Syntax & Debug）', href:'/cal/topic/?id=520003'},
+      {no:4, id:'520004', title:'執行時錯誤（Runtime Error）', href:'/cal/topic/?id=520004'},
+      {no:5, id:'520005', title:'邏輯錯誤（Wrong Answer）', href:'/cal/topic/?id=520005'},
+      {no:6, id:'520006', title:'輸入讀取與型態轉換', href:'/cal/topic/?id=520006'},
+    ];
+    const grid = document.getElementById('grid');
+    let passed=0;
+    const pass520001 = !!localStorage.getItem('pass-520001');
+    const rows = topics.map(t=>{
+      const r = document.createElement('div'); r.className='row';
+      let href = t.href; let canClick = true; let pass = false;
+  if(t.id){ pass = !!localStorage.getItem('pass-'+t.id); }
+  if(t.id==='520002'){ canClick = pass520001; }
+  if(t.id==='520003'){ canClick = !!localStorage.getItem('pass-520002'); }
+  if(t.id==='520004'){ canClick = !!localStorage.getItem('pass-520003'); }
+  if(t.id==='520005'){ canClick = !!localStorage.getItem('pass-520004'); }
+  if(t.id==='520006'){ canClick = !!localStorage.getItem('pass-520005'); }
+      if(pass) passed++;
+      const titleCell = canClick ? `<a href="${href}">${t.title}</a>` : `<span style="opacity:.5">${t.title}</span>`;
+      r.innerHTML = `
+        <div class="cell">第${t.no}題</div>
+        <div class="cell">${titleCell}</div>
+        <div class="cell">${pass?'<span class="pass">YES</span>':'—'}</div>
+      `;
+      if(!canClick){ r.querySelector('a')?.removeAttribute('href'); }
+      return r;
+    });
+    rows.forEach(r=>grid.appendChild(r));
+    document.getElementById('total').textContent = topics.length;
+    document.getElementById('passed').textContent = passed;
+  </script>
+</body>
+</html>

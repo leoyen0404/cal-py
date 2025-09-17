@@ -1,0 +1,6 @@
+{
+  "readonlyLines": [],
+  "language": "python",
+  "title": "執行時錯誤（Runtime Error）",
+  "defaultCode": "# 修正此程式避免執行時錯誤，並正確輸出 42\n# 提示：避免除以 0 或未定義名稱；請自行完成邏輯\nresult = 84 / 0\nprint(result)\n"
+}

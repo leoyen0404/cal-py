@@ -1,0 +1,6 @@
+{
+  "readonlyLines": [],
+  "language": "python",
+  "title": "變數宣告與資料型態",
+  "defaultCode": "# 在下方輸入：x = 5\nprint(x)\n"
+}

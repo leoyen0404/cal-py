@@ -1,0 +1,6 @@
+{
+  "readonlyLines": [],
+  "language": "python",
+  "title": "程式導論與 Hello World",
+  "defaultCode": "print(\"Hello\")\n"
+}
