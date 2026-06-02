@@ -1,12 +1,18 @@
+from pathlib import Path
+from typing import Literal, Optional
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-import os, json
-from typing import Optional
+from pydantic import BaseModel, Field
+
 from .sandbox import run_python
 from .judge import judge_python
 
-app = FastAPI(title="CAL.py Backend", version="0.1.0")
+app = FastAPI(
+    title="CAL.py Backend",
+    version="0.2.0",
+    summary="Local Python runner and judge service for CAL.py practice topics.",
+)
 
 # 允許從本機前端呼叫
 app.add_middleware(
@@ -18,10 +24,10 @@ app.add_middleware(
 )
 
 class RunRequest(BaseModel):
-    language: str = "python"
-    code: str
-    stdin: Optional[str] = ""
-    timeout_ms: Optional[int] = 2000
+    language: Literal["python"] = "python"
+    code: str = Field(..., min_length=1, max_length=100_000)
+    stdin: str = Field(default="", max_length=20_000)
+    timeout_ms: int = Field(default=2000, ge=250, le=5000)
 
 class RunResponse(BaseModel):
     ok: bool
@@ -31,19 +37,33 @@ class RunResponse(BaseModel):
     time_ms: int
 
 class JudgeRequest(BaseModel):
-    language: str = "python"
-    code: str
-    timeout_ms: Optional[int] = 2000
+    language: Literal["python"] = "python"
+    code: str = Field(..., min_length=1, max_length=100_000)
+    timeout_ms: int = Field(default=2000, ge=250, le=5000)
+
+
+class CaseResponse(BaseModel):
+    idx: int
+    ok: bool
+    expected: str
+    actual: str
+    time_ms: int
+    error: Optional[str]
+
+
+class JudgeResponse(BaseModel):
+    total: int
+    passed: int
+    cases: list[CaseResponse]
+
 
 @app.get("/api/health")
 def health():
-    return {"ok": True}
+    return {"ok": True, "service": "CAL.py Backend"}
 
 @app.post("/api/run", response_model=RunResponse)
 def run(req: RunRequest):
-    if req.language != "python":
-        raise HTTPException(status_code=400, detail="Only python is supported")
-    res = run_python(req.code, req.stdin or "", req.timeout_ms or 2000)
+    res = run_python(req.code, req.stdin, req.timeout_ms)
     return RunResponse(
         ok=res.ok,
         stdout=res.stdout,
@@ -52,16 +72,17 @@ def run(req: RunRequest):
         time_ms=res.time_ms,
     )
 
-@app.post("/api/judge/{problem_id}")
+@app.post("/api/judge/{problem_id}", response_model=JudgeResponse)
 def judge(problem_id:str, req: JudgeRequest):
-    if req.language != "python":
-        raise HTTPException(status_code=400, detail="Only python is supported")
-    # 測資目錄: /cal/topic/<id>/tests
-    root = os.path.dirname(os.path.dirname(__file__))  # /cal/server -> /cal
-    tests_dir = os.path.join(root, "topic", problem_id, "tests")
-    if not os.path.isdir(tests_dir):
-        raise HTTPException(status_code=404, detail=f"Tests not found: {tests_dir}")
-    result = judge_python(req.code, tests_dir, req.timeout_ms or 2000)
+    if not problem_id.isdecimal():
+        raise HTTPException(status_code=400, detail="Problem id must be numeric")
+
+    root = Path(__file__).resolve().parents[1]
+    tests_dir = root / "topic" / problem_id / "tests"
+    if not tests_dir.is_dir():
+        raise HTTPException(status_code=404, detail=f"Tests not found for problem {problem_id}")
+
+    result = judge_python(req.code, str(tests_dir), req.timeout_ms)
     return {
         "total": result.total,
         "passed": result.passed,

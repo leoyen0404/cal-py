@@ -2,11 +2,13 @@
 set -euo pipefail
 
 # Paths
-ROOT="/workspaces/codespaces-project-template-js/CAL.py"
-BACK_LOG="/tmp/uvicorn.log"
-FRONT_LOG="/tmp/http5173.log"
-BACK_PID="/tmp/uvicorn.pid"
-FRONT_PID="/tmp/http5173.pid"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROOT="$REPO_ROOT/CAL.py"
+BACK_LOG="${TMPDIR:-/tmp}/cal-py-uvicorn.log"
+FRONT_LOG="${TMPDIR:-/tmp}/cal-py-http5173.log"
+BACK_PID="${TMPDIR:-/tmp}/cal-py-uvicorn.pid"
+FRONT_PID="${TMPDIR:-/tmp}/cal-py-http5173.pid"
 
 echo "[start.sh] Resetting environment and (re)starting services..."
 
@@ -29,7 +31,6 @@ kill_if_running "$FRONT_PID"
 
 # Kill anything listening on 8000/5173
 for port in 8000 5173; do
-  # shellcheck disable=SC2046
   if pids=$(lsof -ti:"$port" -sTCP:LISTEN 2>/dev/null || true); then
     if [[ -n "${pids:-}" ]]; then
       echo "[start.sh] Killing processes on port $port: $pids"
@@ -55,7 +56,7 @@ fi
 source .venv/bin/activate
 
 # Fresh install to avoid ABI mismatch (e.g., musllinux vs manylinux)
-pip install --no-cache-dir --force-reinstall -r cal/server/requirements.txt
+pip install -r cal/server/requirements.txt
 
 # Sanity check for pydantic_core native module; fallback force reinstall
 python - <<'PY' || true
@@ -81,7 +82,7 @@ echo $! > "$BACK_PID"
 
 # Start frontend (static server)
 echo "[start.sh] Starting frontend on :5173"
-nohup python3 -m http.server 5173 --bind 0.0.0.0 \
+nohup python -m http.server 5173 --bind 0.0.0.0 \
   >"$FRONT_LOG" 2>&1 &
 echo $! > "$FRONT_PID"
 

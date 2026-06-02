@@ -14,15 +14,16 @@
   <meta name="msapplication-TileColor" content="#0f172a">
   <meta name="theme-color" content="#0f172a">
   <style>
-    :root{ --bg:#0f172a; --panel:#0b1023; --border:#1f2a44; --text:#e5e7eb; --muted:#94a3b8; --accent:#22c55e; }
+    :root{ --bg:#111318; --panel:#171a21; --border:#303641; --text:#f3f4f6; --muted:#9ca3af; --accent:#38bdf8; --ok:#22c55e; }
     *{box-sizing:border-box} html,body{height:100%;margin:0}
     body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;display:flex;flex-direction:column}
-    header{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);background:#0c1227}
-    .brand{font-weight:700}
+    header{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);background:#161a22}
+    .brand{font-weight:750}
     .spacer{flex:1}
-    .capsule{border:1px solid var(--accent);background:rgba(34,197,94,.12);color:#fff;border-radius:999px;padding:6px 12px;cursor:pointer}
+    .capsule{border:1px solid var(--border);background:#20252f;color:#e5e7eb;border-radius:8px;padding:6px 12px;cursor:pointer}
+    .capsule:hover{border-color:var(--accent)}
     main{max-width:900px;width:92vw;margin:24px auto}
-    table{width:100%;border-collapse:collapse}
+    table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden}
     th,td{border-bottom:1px solid var(--border);padding:10px;text-align:left}
     .muted{color:var(--muted)}
   </style>

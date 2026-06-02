@@ -1,6 +1,7 @@
-import os, glob
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List, Optional
+
 from .sandbox import run_python, RunResult
 
 @dataclass
@@ -19,22 +20,18 @@ class JudgeSummary:
     cases: List[CaseResult]
 
 
-def load_tests(base_dir:str):
-    ins = sorted(glob.glob(os.path.join(base_dir, "*.in")))
+def load_tests(base_dir: str):
+    ins = sorted(Path(base_dir).glob("*.in"))
     cases = []
     for i, infile in enumerate(ins, start=1):
-        out_path = os.path.splitext(infile)[0] + ".out"
-        expected = ""
-        if os.path.exists(out_path):
-            with open(out_path, "r", encoding="utf-8") as f:
-                expected = f.read()
-        with open(infile, "r", encoding="utf-8") as f:
-            input_data = f.read()
+        out_path = infile.with_suffix(".out")
+        expected = out_path.read_text(encoding="utf-8") if out_path.exists() else ""
+        input_data = infile.read_text(encoding="utf-8")
         cases.append((i, input_data, expected))
     return cases
 
 
-def judge_python(code:str, tests_dir:str, timeout_ms:int=2000) -> JudgeSummary:
+def judge_python(code: str, tests_dir: str, timeout_ms: int = 2000) -> JudgeSummary:
     tests = load_tests(tests_dir)
     results: List[CaseResult] = []
     passed = 0

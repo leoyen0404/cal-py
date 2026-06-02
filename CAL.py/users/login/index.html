@@ -14,16 +14,19 @@
   <meta name="msapplication-TileColor" content="#0f172a">
   <meta name="theme-color" content="#0f172a">
   <style>
-    :root{ --bg:#0f172a; --panel:#0b1023; --border:#1f2a44; --text:#e5e7eb; --muted:#94a3b8; --accent:#3b82f6; }
+    :root{ --bg:#111318; --panel:#171a21; --border:#303641; --text:#f3f4f6; --muted:#9ca3af; --accent:#38bdf8; }
     *{box-sizing:border-box} html,body{height:100%;margin:0}
     body{background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;display:grid;place-items:center}
-    .card{width:min(460px,92vw);background:#0c1227;border:1px solid var(--border);border-radius:16px;padding:24px}
-    .brand{font-weight:700;margin-bottom:16px}
+    .card{width:min(460px,92vw);background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:24px;box-shadow:0 20px 70px rgba(0,0,0,.28)}
+    .brand{font-weight:750;margin-bottom:16px}
     label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
-    input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0e1530;color:#e5e7eb}
+    input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#10141b;color:#e5e7eb}
+    input:focus{outline:2px solid rgba(56,189,248,.35);border-color:var(--accent)}
     .row{display:flex;gap:10px}
-    button{width:100%;margin-top:16px;padding:10px 14px;border-radius:12px;border:1px solid var(--accent);background:rgba(59,130,246,.15);color:#fff;cursor:pointer}
+    button{width:100%;margin-top:16px;padding:10px 14px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#061114;cursor:pointer;font-weight:700}
+    button:hover{filter:brightness(1.06)}
     .hint{color:var(--muted);font-size:12px;margin-top:8px}
+    @media (max-width:520px){.row{display:block}}
   </style>
 </head>
 <body>
