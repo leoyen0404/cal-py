@@ -6,7 +6,7 @@
 			"type": "shell",
 			"command": "${workspaceFolder}/.venv/bin/pip install -r cal/server/requirements.txt",
 			"options": {
-				"cwd": "${workspaceFolder}/CAL.py"
+				"cwd": "${workspaceFolder}"
 			}
 		},
 		{
@@ -15,9 +15,9 @@
 			"command": "${workspaceFolder}/.venv/bin/python -m uvicorn cal.server.main:app --reload --host 0.0.0.0 --port 8000",
 			"isBackground": true,
 			"options": {
-				"cwd": "${workspaceFolder}/CAL.py",
+				"cwd": "${workspaceFolder}",
 				"env": {
-					"PYTHONPATH": "${workspaceFolder}/CAL.py"
+					"PYTHONPATH": "${workspaceFolder}"
 				}
 			}
 		},
@@ -27,7 +27,7 @@
 			"command": "${workspaceFolder}/.venv/bin/python -m http.server 8080",
 			"isBackground": true,
 			"options": {
-				"cwd": "${workspaceFolder}/CAL.py"
+				"cwd": "${workspaceFolder}"
 			}
 		}
 	]

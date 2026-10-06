@@ -231,7 +231,7 @@
       readCode = ()=> ta.value; writeCode = (v)=> ta.value=v;
       const saveDebounced = debounce(()=> localStorage.setItem(`code-${TOPIC_ID}`, ta.value), 150);
       on(ta, 'input', saveDebounced);
-      on($('#resetBtn'), 'click', ()=>{ localStorage.removeItem(`code-${TOPIC_ID}`); ta.value=defaultCode; localStorage.setItem(`code-${TOPIC_ID}`, defaultCode); });
+      on($('#resetBtn'), 'click', ()=>{ writeCode(defaultCode); localStorage.setItem(`code-${TOPIC_ID}`, defaultCode); });
       writeTerm('Ace 無法載入，使用簡易編輯器。', 'info');
 
       // 嘗試延後啟用 Ace（若之後載入完成）
@@ -290,16 +290,29 @@
 
   function renderMarkdown(src){
     const esc=(s)=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-    let html=''; const lines=src.split(/\r?\n/); let inCode=false,buf=[];
-    for(const line of lines){
-      if(line.trim().startsWith('```')){ inCode=!inCode; if(!inCode){ html+=`<pre><code>${esc(buf.join('\n'))}</code></pre>`; buf=[]; } continue; }
+    const inline=(s)=>esc(s).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    let html=''; let inCode=false, buf=[], list=null;
+    const closeList=()=>{ if(list){ html+=`</${list}>`; list=null; } };
+    const openList=(tag)=>{ if(list!==tag){ closeList(); html+=`<${tag}>`; list=tag; } };
+    for(const line of src.split(/\r?\n/)){
+      if(line.trim().startsWith('```')){
+        if(inCode){ html+=`<pre><code>${esc(buf.join('\n'))}</code></pre>`; buf=[]; }
+        else closeList();
+        inCode=!inCode; continue;
+      }
       if(inCode){ buf.push(line); continue; }
-      const h=line.match(/^(#{1,3})\s+(.*)$/); if(h){ html += `<h${h[1].length}>${h[2]}</h${h[1].length}>`; continue; }
-      const li=line.match(/^\s*[-*]\s+(.*)$/); if(li){ html+=`<li>${li[1]}</li>`; continue; }
-      if(line.trim()===''){ html+='<p></p>'; continue; }
-      html+=`<p>${line.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`(.+?)`/g,'<code>$1</code>')}</p>`;
+      const h=line.match(/^(#{1,3})\s+(.*)$/);
+      if(h){ closeList(); html+=`<h${h[1].length}>${inline(h[2])}</h${h[1].length}>`; continue; }
+      const li=line.match(/^\s*[-*]\s+(.*)$/);
+      if(li){ openList('ul'); html+=`<li>${inline(li[1])}</li>`; continue; }
+      const oli=line.match(/^\s*\d+[.)]\s+(.*)$/);
+      if(oli){ openList('ol'); html+=`<li>${inline(oli[1])}</li>`; continue; }
+      closeList();
+      if(line.trim()==='') continue;
+      html+=`<p>${inline(line)}</p>`;
     }
-    if(/<li>/.test(html)) html = html.replace(/((?:<li>.*?<\/li>\s*)+)/gs, '<ul>$1</ul>');
+    closeList();
+    if(inCode && buf.length) html+=`<pre><code>${esc(buf.join('\n'))}</code></pre>`;
     return html;
   }
 
@@ -308,9 +321,9 @@
     if(!app.cfg || !app.cfg.requiresInput) return '';
     const el = $('#stdinInput');
     if(!el) return app.cfg.sampleInput || '';
-    let v = (el.value || '').trim();
-    if(!v){ return app.cfg.sampleInput || ''; }
-    return v;
+    const v = el.value || '';
+    if(!v.trim()){ return app.cfg.sampleInput || ''; }
+    return v.endsWith('\n') ? v : v + '\n';
   }
   function writeTerm(text,type){ const box=$('#terminal'); const tpl=$('#tmpl-terminal-line'); const div=tpl.content.firstElementChild.cloneNode(true); div.textContent=text; if(type==='info') div.classList.add('tinfo'); box.appendChild(div); box.scrollTop=box.scrollHeight; }
   function clearTerm(){ $('#terminal').innerHTML=''; }
@@ -323,7 +336,7 @@
       const stdin = getStdinValue();
       const resp = await fetch(`${API_BASE}/api/run`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({language:'python', code: readCode(), stdin})});
       const data = await resp.json();
-      if(!resp.ok){ writeTerm('Error: '+(data.detail||resp.statusText)); return; }
+      if(!resp.ok){ writeTerm('Error: '+formatDetail(data.detail||resp.statusText)); return; }
       if(data.stdout) writeTerm('Your output:\n'+data.stdout.trimEnd());
       if(data.stderr) writeTerm('stderr:\n'+data.stderr.trimEnd());
       writeTerm(`exit=${data.exit_code} time=${data.time_ms}ms`, 'info');
@@ -334,36 +347,24 @@
   async function callJudge(){
     if(app.busy) return; setBusy('judge');
     clearTerm(); writeTerm(`Judging ${TOPIC_ID}...`, 'info');
-    const code = readCode();
     try{
-      // 若題目需要輸入，直接以 judge 驗證，並從回傳顯示 actual/expected
-      if(app.cfg && app.cfg.requiresInput){
-        const judgeResp = await fetch(`${API_BASE}/api/judge/${TOPIC_ID}`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({language:'python', code})});
-        const judgeData = await judgeResp.json();
-        if(!judgeResp.ok){ writeTerm('Error: '+(judgeData.detail||judgeResp.statusText)); return; }
-        const c = (judgeData.cases||[])[0] || {};
-        const actual = ((c.actual||'')+ '').trimEnd();
-        const expected = ((c.expected||'')+ '').trimEnd();
-        writeTerm('Your output:\n'+actual);
-        writeTerm('Expected:\n'+expected);
-        const ok = actual===expected;
-        if(ok){ localStorage.setItem(`pass-${TOPIC_ID}`,'1'); showCongrats(); } else { writeTerm('Not yet, try again!'); }
-        return;
+      const resp = await fetch(`${API_BASE}/api/judge/${TOPIC_ID}`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({language:'python', code: readCode()})});
+      const data = await resp.json();
+      if(!resp.ok){ writeTerm('Error: '+formatDetail(data.detail||resp.statusText)); return; }
+      const cases = data.cases || [];
+      // 以後端判定為準；顯示第一個未通過的測資（全過則顯示第一筆）
+      const shown = cases.find(c=>!c.ok) || cases[0];
+      if(shown){
+        if(cases.length > 1) writeTerm(`Case ${shown.idx}:`, 'info');
+        writeTerm('Your output:\n'+((shown.actual||'')+'').trimEnd());
+        writeTerm('Expected:\n'+((shown.expected||'')+'').trimEnd());
+        if(shown.error) writeTerm('stderr:\n'+String(shown.error).trimEnd());
       }
-
-      // 預設流程：並行執行 run 與 judge 以降低等待時間
-      const [runResp, judgeResp] = await Promise.all([
-        fetch(`${API_BASE}/api/run`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({language:'python', code, stdin:''})}),
-        fetch(`${API_BASE}/api/judge/${TOPIC_ID}`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({language:'python', code})})
-      ]);
-      const [runData, judgeData] = await Promise.all([runResp.json(), judgeResp.json()]);
-      if(!runResp.ok){ writeTerm('Error: '+(runData.detail||runResp.statusText)); return; }
-      if(!judgeResp.ok){ writeTerm('Error: '+(judgeData.detail||judgeResp.statusText)); return; }
-      const actual = (runData.stdout||'').trimEnd();
-      const expected = ((judgeData.cases||[])[0]?.expected||'').trimEnd();
-      writeTerm('Your output:\n'+actual);
-      writeTerm('Expected:\n'+expected);
-      const ok = actual===expected;
+      if(cases.length > 1){
+        writeTerm(cases.map(c=>`${c.ok?'✓':'✗'} Case ${c.idx} (${c.time_ms}ms)`).join('\n'), 'info');
+      }
+      writeTerm(`Passed ${data.passed}/${data.total}`, 'info');
+      const ok = data.total > 0 && data.passed === data.total;
       if(ok){
         localStorage.setItem(`pass-${TOPIC_ID}`,'1');
         showCongrats();
@@ -372,6 +373,11 @@
       }
     }catch(err){ writeTerm(String(err)); }
     finally{ setBusy(null); }
+  }
+
+  function formatDetail(detail){
+    if(Array.isArray(detail)) return detail.map(d=>d.msg||JSON.stringify(d)).join('; ');
+    return String(detail);
   }
 
   function showCongrats(){
