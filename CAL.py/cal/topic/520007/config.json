@@ -1,0 +1,8 @@
+{
+  "readonlyLines": [],
+  "language": "python",
+  "title": "條件判斷 if / elif / else",
+  "requiresInput": true,
+  "sampleInput": "85\n",
+  "defaultCode": "# 讀入 0~100 的整數分數，輸出對應等第 A / B / C / D / F\nscore = int(input())\n# TODO: 使用 if / elif / else 判斷等第並用 print() 輸出\n"
+}

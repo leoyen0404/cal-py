@@ -58,33 +58,32 @@
   </main>
   <script>
     const topics = [
-      {no:1, id:'520001', title:'程式導論與 Hello World', href:'/cal/topic/?id=520001'},
-      {no:2, id:'520002', title:'變數宣告與資料型態', href:'/cal/topic/?id=520002'},
-      {no:3, id:'520003', title:'語法錯誤與除錯（Syntax & Debug）', href:'/cal/topic/?id=520003'},
-      {no:4, id:'520004', title:'執行時錯誤（Runtime Error）', href:'/cal/topic/?id=520004'},
-      {no:5, id:'520005', title:'邏輯錯誤（Wrong Answer）', href:'/cal/topic/?id=520005'},
-      {no:6, id:'520006', title:'輸入讀取與型態轉換', href:'/cal/topic/?id=520006'},
+      {id:'520001', title:'程式導論與 Hello World'},
+      {id:'520002', title:'變數宣告與資料型態'},
+      {id:'520003', title:'語法錯誤與除錯（Syntax & Debug）'},
+      {id:'520004', title:'執行時錯誤（Runtime Error）'},
+      {id:'520005', title:'邏輯錯誤（Wrong Answer）'},
+      {id:'520006', title:'輸入讀取與型態轉換'},
+      {id:'520007', title:'條件判斷 if / elif / else'},
+      {id:'520008', title:'迴圈 for 與 range()'},
     ];
     const grid = document.getElementById('grid');
+    const isPassed = (id)=>{ try{ return !!localStorage.getItem('pass-'+id); }catch{ return false; } };
     let passed=0;
-    const pass520001 = !!localStorage.getItem('pass-520001');
-    const rows = topics.map(t=>{
+    // 依序解鎖：第一題永遠開放，其餘需上一題通過
+    const rows = topics.map((t, i)=>{
       const r = document.createElement('div'); r.className='row';
-      let href = t.href; let canClick = true; let pass = false;
-  if(t.id){ pass = !!localStorage.getItem('pass-'+t.id); }
-  if(t.id==='520002'){ canClick = pass520001; }
-  if(t.id==='520003'){ canClick = !!localStorage.getItem('pass-520002'); }
-  if(t.id==='520004'){ canClick = !!localStorage.getItem('pass-520003'); }
-  if(t.id==='520005'){ canClick = !!localStorage.getItem('pass-520004'); }
-  if(t.id==='520006'){ canClick = !!localStorage.getItem('pass-520005'); }
+      const pass = isPassed(t.id);
+      const canClick = i===0 || isPassed(topics[i-1].id);
       if(pass) passed++;
-      const titleCell = canClick ? `<a href="${href}">${t.title}</a>` : `<span style="opacity:.5">${t.title}</span>`;
+      const titleCell = canClick
+        ? `<a href="/cal/topic/?id=${t.id}">${t.title}</a>`
+        : `<span style="opacity:.5" title="請先通過上一題">${t.title}</span>`;
       r.innerHTML = `
-        <div class="cell">第${t.no}題</div>
+        <div class="cell">第${i+1}題</div>
         <div class="cell">${titleCell}</div>
         <div class="cell">${pass?'<span class="pass">YES</span>':'—'}</div>
       `;
-      if(!canClick){ r.querySelector('a')?.removeAttribute('href'); }
       return r;
     });
     rows.forEach(r=>grid.appendChild(r));

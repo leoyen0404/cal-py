@@ -1,0 +1,8 @@
+{
+  "readonlyLines": [],
+  "language": "python",
+  "title": "迴圈 for 與 range()",
+  "requiresInput": true,
+  "sampleInput": "5\n",
+  "defaultCode": "# 讀入正整數 n，依序輸出 1 到 n（每行一個），最後輸出 Sum = 總和\nn = int(input())\ntotal = 0\n# TODO: 使用 for 迴圈與 range() 輸出每個數字並累加到 total\n\nprint(\"Sum =\", total)\n"
+}
